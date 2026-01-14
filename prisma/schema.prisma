@@ -1,0 +1,21 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Presentation {
+  id            String   @id @default(cuid())
+  companyName   String
+  logoUrl       String?  // Base64 encoded logo or URL
+  primaryColor  String   @default("#3B82F6")
+  financialData String   // JSON string of financial data
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
