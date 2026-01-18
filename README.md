@@ -29,8 +29,35 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Environment Variables
+
+This application requires the following environment variables:
+
+- `DATABASE_URL` - Database connection string. Currently uses SQLite for local development (e.g., `file:./prisma/dev.db`). For Vercel deployment, you'll need a PostgreSQL connection string.
+- `BRANDFETCH_CLIENT_ID` - Brandfetch API client ID for fetching company logos and branding information.
+
+Create a `.env` file in the root directory for local development:
+
+```bash
+DATABASE_URL="file:./prisma/dev.db"
+BRANDFETCH_CLIENT_ID="your-brandfetch-client-id"
+```
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Prerequisites for Vercel Deployment
+
+1. **Database Migration Required**: This app currently uses SQLite, which requires a writable filesystem. Vercel uses serverless functions with a read-only filesystem, so you'll need to migrate to a hosted database before deployment:
+   - **Recommended**: Use [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres) or another PostgreSQL provider
+   - Update `DATABASE_URL` in your Vercel project settings with the PostgreSQL connection string
+   - Run Prisma migrations: `npx prisma migrate deploy`
+
+2. **Set Environment Variables**: In your Vercel project settings, add:
+   - `DATABASE_URL` - Your PostgreSQL connection string
+   - `BRANDFETCH_CLIENT_ID` - Your Brandfetch API client ID
+
+3. **Deploy**: Connect your GitHub repository to Vercel, and Vercel will automatically detect Next.js and deploy your app.
+
+Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
