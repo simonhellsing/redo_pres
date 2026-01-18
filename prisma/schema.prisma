@@ -11,11 +11,15 @@ datasource db {
 }
 
 model Presentation {
-  id            String   @id @default(cuid())
-  companyName   String
-  logoUrl       String?  // Base64 encoded logo or URL
-  primaryColor  String   @default("#3B82F6")
-  financialData String   // JSON string of financial data
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                  String   @id @default(cuid())
+  companyName         String   // Presenter (accounting firm)
+  logoUrl             String?  // Presenter logo
+  primaryColor        String   @default("#3B82F6")
+  themeMode           String   @default("dark") // "dark" or "light"
+  customerCompanyName String   // Customer whose financials are shown
+  customerLogoUrl     String?  // Customer logo
+  presentationTitle   String   @default("Financial Update 2025")
+  financialData       String   // JSON string of financial data
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }

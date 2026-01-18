@@ -23,7 +23,12 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        sans: ['var(--font-inter)', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        lora: ['var(--font-lora)', 'serif'],
+        'noto-sans': ['var(--font-noto-sans)', 'sans-serif'],
+        oxanium: ['var(--font-oxanium)', 'sans-serif'],
+        // Geom is not available via Google Fonts - using a similar geometric sans-serif
+        geom: ['var(--font-noto-sans)', 'sans-serif'], // Fallback to Noto Sans for geometric look
       },
       animation: {
         "shimmer": "shimmer 2s linear infinite",
@@ -38,4 +43,5 @@ const config: Config = {
   },
   plugins: [],
 };
+
 export default config;

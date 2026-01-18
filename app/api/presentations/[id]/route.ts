@@ -1,15 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  request: Request,
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params
-
     const presentation = await prisma.presentation.findUnique({
-      where: { id },
+      where: { id: params.id },
     })
 
     if (!presentation) {
@@ -20,12 +18,8 @@ export async function GET(
     }
 
     return NextResponse.json({
-      id: presentation.id,
-      companyName: presentation.companyName,
-      logoUrl: presentation.logoUrl,
-      primaryColor: presentation.primaryColor,
+      ...presentation,
       financialData: JSON.parse(presentation.financialData),
-      createdAt: presentation.createdAt,
     })
   } catch (error) {
     console.error('Error fetching presentation:', error)
@@ -36,22 +30,56 @@ export async function GET(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+export async function PUT(
+  request: Request,
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params
+    const body = await request.json()
+    const {
+      companyName,
+      logoUrl,
+      primaryColor,
+      themeMode,
+      customerCompanyName,
+      customerLogoUrl,
+      presentationTitle,
+    } = body
 
-    await prisma.presentation.delete({
-      where: { id },
+    // Check if presentation exists
+    const existing = await prisma.presentation.findUnique({
+      where: { id: params.id },
     })
 
-    return NextResponse.json({ success: true })
+    if (!existing) {
+      return NextResponse.json(
+        { error: 'Presentation not found' },
+        { status: 404 }
+      )
+    }
+
+    // Update presentation settings (don't regenerate financial data)
+    const presentation = await prisma.presentation.update({
+      where: { id: params.id },
+      data: {
+        companyName,
+        logoUrl,
+        primaryColor: primaryColor || '#3B82F6',
+        themeMode: themeMode || 'dark',
+        customerCompanyName,
+        customerLogoUrl,
+        presentationTitle: presentationTitle || 'Financial Update 2025',
+      },
+    })
+
+    return NextResponse.json({
+      ...presentation,
+      financialData: JSON.parse(presentation.financialData),
+    })
   } catch (error) {
-    console.error('Error deleting presentation:', error)
+    console.error('Error updating presentation:', error)
     return NextResponse.json(
-      { error: 'Failed to delete presentation' },
+      { error: 'Failed to update presentation' },
       { status: 500 }
     )
   }

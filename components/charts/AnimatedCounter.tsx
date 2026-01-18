@@ -1,16 +1,15 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { motion, useInView } from 'framer-motion'
+import { motion, useSpring, useTransform } from 'framer-motion'
 
 interface AnimatedCounterProps {
   value: number
   prefix?: string
   suffix?: string
   decimals?: number
-  duration?: number
   className?: string
-  formatNumber?: boolean
+  duration?: number
 }
 
 export function AnimatedCounter({
@@ -18,64 +17,53 @@ export function AnimatedCounter({
   prefix = '',
   suffix = '',
   decimals = 0,
-  duration = 2,
   className = '',
-  formatNumber = true,
+  duration = 1,
 }: AnimatedCounterProps) {
-  const [displayValue, setDisplayValue] = useState(0)
+  const [isInView, setIsInView] = useState(false)
   const ref = useRef<HTMLSpanElement>(null)
-  const isInView = useInView(ref, { once: true, margin: '-50px' })
-  const animationRef = useRef<number>()
 
   useEffect(() => {
-    if (!isInView) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true)
+        }
+      },
+      { threshold: 0.1 }
+    )
 
-    const startTime = Date.now()
-    const startValue = 0
-    const endValue = value
-
-    const animate = () => {
-      const elapsed = Date.now() - startTime
-      const progress = Math.min(elapsed / (duration * 1000), 1)
-      
-      // Easing function (easeOutExpo)
-      const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress)
-      
-      const current = startValue + (endValue - startValue) * eased
-      setDisplayValue(current)
-
-      if (progress < 1) {
-        animationRef.current = requestAnimationFrame(animate)
-      }
+    if (ref.current) {
+      observer.observe(ref.current)
     }
 
-    animationRef.current = requestAnimationFrame(animate)
+    return () => observer.disconnect()
+  }, [])
 
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current)
-      }
+  const spring = useSpring(0, {
+    stiffness: 50,
+    damping: 20,
+    duration: duration * 1000,
+  })
+
+  const display = useTransform(spring, (current) => {
+    const formatted = current.toFixed(decimals)
+    const [whole, decimal] = formatted.split('.')
+    const withCommas = parseInt(whole).toLocaleString()
+    return decimal ? `${withCommas}.${decimal}` : withCommas
+  })
+
+  useEffect(() => {
+    if (isInView) {
+      spring.set(value)
     }
-  }, [isInView, value, duration])
-
-  const formattedValue = formatNumber
-    ? displayValue.toLocaleString('en-US', {
-        minimumFractionDigits: decimals,
-        maximumFractionDigits: decimals,
-      })
-    : displayValue.toFixed(decimals)
+  }, [isInView, value, spring])
 
   return (
-    <motion.span
-      ref={ref}
-      className={className}
-      initial={{ opacity: 0, y: 20 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5 }}
-    >
+    <span ref={ref} className={className}>
       {prefix}
-      {formattedValue}
+      <motion.span>{display}</motion.span>
       {suffix}
-    </motion.span>
+    </span>
   )
 }
