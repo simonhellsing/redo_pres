@@ -3,6 +3,10 @@ import { prisma } from '@/lib/db'
 import { generateMockFinancialData } from '@/lib/mockData'
 import { generateBrandPalette } from '@/lib/color-utils'
 
+// Force dynamic rendering - prevent static generation
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function Home() {
   try {
     // Check if Learnster presentation already exists
