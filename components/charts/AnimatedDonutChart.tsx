@@ -30,16 +30,24 @@ export function AnimatedDonutChart({
     return () => clearTimeout(timer)
   }, [])
 
-  const renderActiveShape = (props: {
-    cx: number
-    cy: number
-    innerRadius: number
-    outerRadius: number
-    startAngle: number
-    endAngle: number
-    fill: string
-  }) => {
-    const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props
+  const renderActiveShape = (props: unknown) => {
+    const {
+      cx,
+      cy,
+      innerRadius,
+      outerRadius,
+      startAngle,
+      endAngle,
+      fill,
+    } = props as {
+      cx: number
+      cy: number
+      innerRadius: number
+      outerRadius: number
+      startAngle: number
+      endAngle: number
+      fill: string
+    }
 
     return (
       <g>
