@@ -72,7 +72,7 @@ export function AnimatedBarChart({
                   value: Number(p.value),
                   color: String((p.payload as { color?: string })?.color || color),
                 }))}
-                label={label}
+                label={label ? String(label) : undefined}
                 formatValue={formatTooltip}
                 singleValue={true}
               />
