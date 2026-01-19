@@ -33,15 +33,46 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 This application requires the following environment variables:
 
-- `DATABASE_URL` - Database connection string. Currently uses SQLite for local development (e.g., `file:./prisma/dev.db`). For Vercel deployment, you'll need a PostgreSQL connection string.
-- `BRANDFETCH_CLIENT_ID` - Brandfetch API client ID for fetching company logos and branding information.
+- `DATABASE_URL` - PostgreSQL database connection string (from Supabase)
+- `BRANDFETCH_CLIENT_ID` - Brandfetch API client ID for fetching company logos and branding information (optional)
 
 Create a `.env` file in the root directory for local development:
 
 ```bash
-DATABASE_URL="file:./prisma/dev.db"
+DATABASE_URL="postgresql://user:password@host:5432/database?schema=public"
 BRANDFETCH_CLIENT_ID="your-brandfetch-client-id"
 ```
+
+## Database Setup with Supabase
+
+This application uses Supabase (PostgreSQL) for the database.
+
+### Setting up Supabase
+
+1. **Create a Supabase project**:
+   - Go to [https://supabase.com](https://supabase.com)
+   - Sign up or log in
+   - Click "New Project"
+   - Choose a name, database password, and region
+   - Wait for the project to be created (takes ~2 minutes)
+
+2. **Get your database connection string**:
+   - In your Supabase project dashboard, go to **Settings** → **Database**
+   - Scroll down to **Connection string** section
+   - Copy the **URI** connection string (it looks like: `postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres`)
+   - Replace `[YOUR-PASSWORD]` with your actual database password
+   - This is your `DATABASE_URL`
+
+3. **Run migrations**:
+   ```bash
+   # Set your DATABASE_URL in .env first, then:
+   npx prisma migrate deploy
+   ```
+
+4. **Generate Prisma Client** (if needed):
+   ```bash
+   npx prisma generate
+   ```
 
 ## Deploy on Vercel
 
@@ -49,15 +80,21 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 ### Prerequisites for Vercel Deployment
 
-1. **Database Migration Required**: This app currently uses SQLite, which requires a writable filesystem. Vercel uses serverless functions with a read-only filesystem, so you'll need to migrate to a hosted database before deployment:
-   - **Recommended**: Use [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres) or another PostgreSQL provider
-   - Update `DATABASE_URL` in your Vercel project settings with the PostgreSQL connection string
-   - Run Prisma migrations: `npx prisma migrate deploy`
+1. **Set up Supabase** (see above)
 
-2. **Set Environment Variables**: In your Vercel project settings, add:
-   - `DATABASE_URL` - Your PostgreSQL connection string
-   - `BRANDFETCH_CLIENT_ID` - Your Brandfetch API client ID
+2. **Set Environment Variables in Vercel**:
+   - Go to your Vercel project → **Settings** → **Environment Variables**
+   - Add the following:
+     - `DATABASE_URL` - Your Supabase PostgreSQL connection string (from step 2 above)
+     - `BRANDFETCH_CLIENT_ID` - Your Brandfetch API client ID (optional)
 
-3. **Deploy**: Connect your GitHub repository to Vercel, and Vercel will automatically detect Next.js and deploy your app.
+3. **Deploy**: 
+   - Connect your GitHub repository to Vercel
+   - Vercel will automatically detect Next.js and deploy your app
+   - The `postinstall` script will automatically generate Prisma Client during build
+
+4. **Run migrations on Vercel** (one-time setup):
+   - After first deployment, you may need to run migrations
+   - You can do this via Vercel's CLI or by adding a build script that runs `prisma migrate deploy`
 
 Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
