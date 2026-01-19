@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+// TypeScript fix: convert label to string for ChartTooltip
 import {
   BarChart,
   Bar,
