@@ -105,7 +105,7 @@ export function AnimatedWaterfallChart({
                   value: Number(p.value),
                   payload: p.payload as Record<string, unknown>,
                 }))}
-                label={label}
+                label={label ? String(label) : undefined}
               />
             )}
             cursor={{

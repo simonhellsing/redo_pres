@@ -87,7 +87,7 @@ export function AnimatedLineChart({
                   value: Number(p.value),
                   color: color,
                 }))}
-                label={label}
+                label={label ? String(label) : undefined}
                 formatValue={formatTooltip}
                 singleValue={true}
               />

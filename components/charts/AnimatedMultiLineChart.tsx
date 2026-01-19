@@ -89,7 +89,7 @@ export function AnimatedMultiLineChart({
                   color: lineConfigMap[String(p.dataKey)]?.color || '#3B82F6',
                   dataKey: String(p.dataKey),
                 }))}
-                label={label}
+                label={label ? String(label) : undefined}
                 formatValue={formatTooltip}
                 showColorDot={true}
               />
