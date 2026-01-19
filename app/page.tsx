@@ -29,23 +29,31 @@ export default function Home() {
       .then(res => res.json())
       .then(data => {
         if (data.id) {
-          router.push(`/sales/${data.id}`)
-          // Keep redirecting state true to prevent flash of content
+          // Use window.location for a hard redirect to ensure it works on Vercel
+          window.location.href = `/sales/${data.id}`
         } else {
           setRedirecting(false)
         }
       })
       .catch((error) => {
         console.error('Error initializing presentation:', error)
-        setRedirecting(false)
-        // Fall back to showing the list if initialization fails
+        // Try to get existing presentations and redirect to first one
         fetch('/api/presentations')
           .then(res => res.json())
           .then(data => {
-            setPresentations(data)
+            if (data && data.length > 0) {
+              // Redirect to first presentation's sales page
+              window.location.href = `/sales/${data[0].id}`
+            } else {
+              setRedirecting(false)
+              setPresentations([])
+              setLoading(false)
+            }
+          })
+          .catch(() => {
+            setRedirecting(false)
             setLoading(false)
           })
-          .catch(() => setLoading(false))
       })
   }, [router])
 
