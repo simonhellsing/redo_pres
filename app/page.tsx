@@ -8,6 +8,9 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export default async function Home() {
+  // TEMPORARY: Show that server component is running
+  console.log('Home page server component is running!')
+  
   try {
     // Check if Learnster presentation already exists
     let presentation = await prisma.presentation.findFirst({
@@ -15,6 +18,8 @@ export default async function Home() {
         customerCompanyName: 'Learnster',
       },
     })
+    
+    console.log('Presentation lookup result:', presentation ? 'Found' : 'Not found')
 
     // If it doesn't exist, create it
     if (!presentation) {
@@ -75,10 +80,16 @@ export default async function Home() {
 
   // Fallback: if no presentation exists and we can't create one, show error
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">No presentations found</h1>
-        <p className="text-gray-600">Please check your database connection.</p>
+    <div className="min-h-screen bg-red-100 flex items-center justify-center">
+      <div className="text-center max-w-md p-8 bg-white rounded-lg shadow-lg">
+        <h1 className="text-2xl font-bold text-red-900 mb-4">⚠️ Server Component Running</h1>
+        <p className="text-gray-700 mb-2">If you see this, the new server component is working!</p>
+        <p className="text-sm text-gray-600 mb-4">
+          But no presentation was found or created. Check Vercel logs for errors.
+        </p>
+        <p className="text-xs text-gray-500">
+          This is a test message to verify the new code is deployed.
+        </p>
       </div>
     </div>
   )
