@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { BrandProvider } from '@/lib/brand-context'
 
 interface Presentation {
@@ -20,9 +20,14 @@ type BrandType = 1 | 2
 export default function SalesPage() {
   const params = useParams()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [presentation, setPresentation] = useState<Presentation | null>(null)
   const [loading, setLoading] = useState(true)
-  const [activeBrand, setActiveBrand] = useState<BrandType>(1)
+  // Get brand from query params (2 = Brand1View), default to 1 (Brand2View)
+  const brandFromQuery = searchParams?.get('brand')
+  const [activeBrand, setActiveBrand] = useState<BrandType>(
+    brandFromQuery === '2' ? 2 : 1
+  )
 
   useEffect(() => {
     if (params.id) {
@@ -39,6 +44,20 @@ export default function SalesPage() {
 
   const handleShowExample = () => {
     router.push(`/presentation/${params.id}`)
+  }
+
+  const handleShowExampleLightDemo = async () => {
+    try {
+      const res = await fetch('/api/presentations/demo-light', { method: 'POST' })
+      const data = await res.json()
+      if (data.id) {
+        // Pass the original sales page ID and brand as query parameters
+        // brand=2 means Brand1View (since activeBrand === 2 shows Brand1View)
+        router.push(`/presentation/${data.id}?returnTo=${params.id}&brand=2`)
+      }
+    } catch (error) {
+      console.error('Error loading light mode demo:', error)
+    }
   }
 
   const handleInterested = () => {
@@ -83,7 +102,7 @@ export default function SalesPage() {
         ) : (
           <Brand1View
             presentation={presentation}
-            onShowExample={handleShowExample}
+            onShowExample={handleShowExampleLightDemo}
             onInterested={handleInterested}
             onNotRelevant={handleNotRelevant}
           />

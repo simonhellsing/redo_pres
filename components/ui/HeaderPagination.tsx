@@ -15,6 +15,7 @@ interface HeaderPaginationProps {
   customerLogoUrl?: string | null
   presentationTitle?: string
   presentationId?: string
+  brand?: string | null
 }
 
 export function HeaderPagination({
@@ -28,6 +29,7 @@ export function HeaderPagination({
   customerLogoUrl,
   presentationTitle,
   presentationId,
+  brand,
 }: HeaderPaginationProps) {
   const router = useRouter()
   const { themeMode } = useBrand()
@@ -151,7 +153,10 @@ export function HeaderPagination({
         {/* Close/X button */}
         {presentationId && (
           <button
-            onClick={() => router.push(`/sales/${presentationId}`)}
+            onClick={() => {
+              const url = brand ? `/sales/${presentationId}?brand=${brand}` : `/sales/${presentationId}`
+              router.push(url)
+            }}
             className="p-1.5 rounded-lg transition-colors cursor-pointer"
             style={{ color: buttonColor }}
             onMouseEnter={(e) => {

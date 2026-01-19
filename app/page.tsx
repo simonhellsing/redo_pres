@@ -21,18 +21,23 @@ export default function Home() {
   const [presentations, setPresentations] = useState<Presentation[]>([])
   const [loading, setLoading] = useState(true)
   const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [redirecting, setRedirecting] = useState(true)
 
   useEffect(() => {
-    // Initialize Learnster presentation and redirect to it
+    // Initialize Learnster presentation and redirect to Brand2View sales page
     fetch('/api/presentations/init', { method: 'POST' })
       .then(res => res.json())
       .then(data => {
         if (data.id) {
-          router.push(`/presentation/${data.id}`)
+          router.push(`/sales/${data.id}`)
+          // Keep redirecting state true to prevent flash of content
+        } else {
+          setRedirecting(false)
         }
       })
       .catch((error) => {
         console.error('Error initializing presentation:', error)
+        setRedirecting(false)
         // Fall back to showing the list if initialization fails
         fetch('/api/presentations')
           .then(res => res.json())
@@ -59,6 +64,15 @@ export default function Home() {
       day: 'numeric',
       year: 'numeric',
     })
+  }
+
+  // Show loading state while redirecting to prevent flash of content
+  if (redirecting) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-brand border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
   }
 
   return (

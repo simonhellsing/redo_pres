@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BrandProvider } from '@/lib/brand-context'
 import { HeaderPagination } from '@/components/ui'
@@ -34,10 +34,15 @@ interface Presentation {
 export default function PresentationPage() {
   const params = useParams()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [presentation, setPresentation] = useState<Presentation | null>(null)
   const [loading, setLoading] = useState(true)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [direction, setDirection] = useState(0)
+  
+  // Get returnTo sales page ID and brand from query params (for light mode demo)
+  const returnToSalesId = searchParams?.get('returnTo')
+  const brandQuery = searchParams?.get('brand')
 
   const slideNames = [
     'Introduktion',
@@ -78,9 +83,12 @@ export default function PresentationPage() {
       setCurrentSlide((prev) => prev + 1)
     } else if (currentSlide === totalSlides - 1) {
       // Navigate to sales page after the last slide
-      router.push(`/sales/${params.id}`)
+      // Use returnTo if available (for light mode demo), otherwise use presentation ID
+      const salesPageId = returnToSalesId || params.id
+      const url = brandQuery ? `/sales/${salesPageId}?brand=${brandQuery}` : `/sales/${salesPageId}`
+      router.push(url)
     }
-  }, [currentSlide, totalSlides, router, params.id])
+  }, [currentSlide, totalSlides, router, params.id, returnToSalesId])
 
   const prevSlide = useCallback(() => {
     if (currentSlide > 0) {
@@ -197,7 +205,8 @@ export default function PresentationPage() {
                 customerCompanyName={presentation.customerCompanyName}
                 customerLogoUrl={presentation.customerLogoUrl}
                 presentationTitle={presentation.presentationTitle}
-                presentationId={presentation.id}
+                presentationId={returnToSalesId || presentation.id}
+                brand={brandQuery}
               />
             </motion.div>
           )}
