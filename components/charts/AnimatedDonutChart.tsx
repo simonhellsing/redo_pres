@@ -88,7 +88,6 @@ export function AnimatedDonutChart({
             animationBegin={0}
             animationDuration={1000}
             stroke="none"
-            activeIndex={activeIndex !== null ? activeIndex : undefined}
             activeShape={renderActiveShape}
             onMouseEnter={(_, index) => setActiveIndex(index)}
             onMouseLeave={() => setActiveIndex(null)}
