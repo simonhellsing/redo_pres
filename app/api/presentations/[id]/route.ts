@@ -17,9 +17,24 @@ export async function GET(
       )
     }
 
+    // financialData might be stored as a JSON string or native JSON depending on DB setup
+    let parsedFinancialData: unknown
+    try {
+      parsedFinancialData =
+        typeof (presentation as any).financialData === 'string'
+          ? JSON.parse((presentation as any).financialData)
+          : (presentation as any).financialData
+    } catch (parseError) {
+      console.error('Error parsing financialData for presentation:', parseError)
+      return NextResponse.json(
+        { error: 'Failed to parse financial data for presentation' },
+        { status: 500 },
+      )
+    }
+
     return NextResponse.json({
       ...presentation,
-      financialData: JSON.parse(presentation.financialData),
+      financialData: parsedFinancialData,
     })
   } catch (error) {
     console.error('Error fetching presentation:', error)
