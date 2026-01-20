@@ -30,6 +30,10 @@ export default function SalesPageClient({ presentation }: SalesPageClientProps) 
     brandFromQuery === '2' ? 2 : 1
   )
 
+  // Normalize themeMode to a safe value for BrandProvider
+  const normalizedThemeMode: 'dark' | 'light' =
+    presentation.themeMode === 'light' ? 'light' : 'dark'
+
   const handleShowExample = () => {
     router.push(`/presentation/${presentation.id}`)
   }
@@ -59,7 +63,7 @@ export default function SalesPageClient({ presentation }: SalesPageClientProps) 
       primaryColor={presentation.primaryColor}
       logoUrl={presentation.logoUrl}
       companyName={presentation.companyName}
-      themeMode={presentation.themeMode}
+      themeMode={normalizedThemeMode}
     >
       <div className="relative min-h-screen w-full">
         {activeBrand === 1 ? (
