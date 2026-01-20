@@ -9,7 +9,7 @@ interface Presentation {
   companyName: string
   logoUrl: string | null
   primaryColor: string
-  themeMode: 'dark' | 'light'
+  themeMode: string
   customerCompanyName: string
   customerLogoUrl: string | null
   presentationTitle: string
